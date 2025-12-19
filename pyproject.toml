@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opsflow"
+version = "1.0.0"
+description = "OpsFlow is a modular automation framework that orchestrates system tasks, integrates plugins, and sends notifications across multiple channels, making it easy to build flexible operational workflows."
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.12.5",
+    "PyYAML>=6.0.3",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.optional-dependencies]
+rclone = ["rclone-adapter>=0.2.0"]

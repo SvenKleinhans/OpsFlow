@@ -1,0 +1,39 @@
+from typing import Optional
+from enum import Enum
+from pydantic import field_validator
+
+from opsflow.core.config import NotifierConfig
+
+
+class SmtpSecurity(str, Enum):
+    """Defines the SMTP transport security mode."""
+
+    NONE = "none"
+    STARTTLS = "starttls"
+    SSL = "ssl"
+
+
+class EmailNotifierConfig(NotifierConfig):
+    """Configuration for the EmailNotifier.
+
+    Attributes:
+        server (str): SMTP server address. Defaults to "localhost".
+        port (int): SMTP server port. Defaults to 25.
+        sender (str): Email sender address.
+        recipient (str): Email recipient address.
+    """
+
+    server: str = "localhost"
+    port: int = 25
+    sender: str
+    recipient: str
+    security: SmtpSecurity = SmtpSecurity.NONE
+    password: Optional[str] = None
+    user: Optional[str] = None
+
+    @classmethod
+    @field_validator("port")
+    def validate_port(cls, v: int) -> int:
+        if v <= 0 or v > 65535:
+            raise ValueError("Port must be between 1 and 65535")
+        return v

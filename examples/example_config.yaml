@@ -1,0 +1,16 @@
+dry_run: true
+
+logging:
+  debug: false
+  file: demo_workflow.log
+
+notifiers:
+  example_notifier:
+    enabled: true
+    notify_option: notify_value
+
+plugins:
+  example_plugin:
+    enabled: true
+    example_option: demo_value
+

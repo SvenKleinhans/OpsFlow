@@ -9,8 +9,16 @@ OpsFlow is a modular automation framework for orchestrating operational tasks, m
 - **System-specific managers** — SystemManager implementations are bound to a concrete system type (e.g. Linux, Windows) and encapsulate system discovery and system-level operations.
 - **Package-specific managers** — PackageManager implementations target a specific package ecosystem (e.g. APT) and provide a structured interface for interacting with system packages or components.
 - **Extensible architecture** — plugins, notifiers, system managers and package managers follow consistent base abstractions and can be added or replaced without touching the core.
-- **Flexible configuration** — configure OpsFlow declaratively via YAML or programmatically in Python for preconfigured workflows.
+- **Flexible configuration** — all configurations are implemented as **Pydantic models**, including inherited configurations (e.g., PluginConfig), enabling automatic validation and type safety.
+- **Parallel execution of plugins** — plugins can be executed concurrently to improve workflow performance.
 - **Lightweight, OOP-first core** — a minimal core with clearly defined base classes, designed for testable and maintainable object-oriented extensions.
+
+# Dependencies
+
+OpsFlow requires Python 3.13 or higher. The core dependencies are:
+
+- `pydantic` — for configuration models and validation
+- `PyYAML` — for YAML-based workflow configuration
 
 # Concepts & Terminology
 

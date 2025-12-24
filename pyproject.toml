@@ -18,10 +18,12 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent"
 ]
 
@@ -45,11 +47,72 @@ keywords = [
 
 [project.optional-dependencies]
 rclone = ["rclone-adapter>=0.2.0"]
+dev = [
+    "ruff>=0.14.10",
+    "pytest>=7.4.0",
+    "pytest-cov>=7.0.0",
+]
 
 [project.urls]
 PyPI = "https://pypi.org/project/opsflow/"
+Homepage = "https://github.com/SvenKleinhans/OpsFlow"
 Repository = "https://github.com/SvenKleinhans/OpsFlow"
 Documentation = "https://github.com/SvenKleinhans/OpsFlow#readme"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=opsflow",
+    "--cov-report=term",
+    "--cov-report=xml",
+]
+
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+source = ["opsflow"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+fix = true
+unsafe-fixes = false
+
+[lint]
+select = [
+    "E",     # pycodestyle errors
+    "F",     # pyflakes (undefined names, unused imports)
+    "W",     # pycodestyle warnings
+    "B",     # flake8-bugbear (likely bugs)
+    "I",     # isort (import ordering)
+    "Q",     # flake8-quotes (quote consistency)
+    "UP",    # pyupgrade (modern Python syntax)
+    "SIM",   # flake8-simplify (simplify code)
+    "RUF",   # ruff-specific rules
+    "PERF",  # performance anti-patterns
+    "PL",    # pylint-inspired checks
+    "ANN",   # type annotation issues
+]
+
+ignore = [
+    "ANN401",   # any type
+    "S101",     # assert
+    "PLR2004",  # magic values
+]
+
+[flake8-quotes]
+inline-quotes = "double"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "ANN"]

@@ -2,8 +2,8 @@
 Example auto-registered plugin for demonstration purposes.
 """
 
-from opsflow.core.plugin import Plugin, PluginRegistry
 from opsflow.core.config import PluginConfig
+from opsflow.core.plugin import Plugin, PluginRegistry
 
 
 class ExamplePluginAutoConfig(PluginConfig):
@@ -23,9 +23,7 @@ class ExamplePluginAuto(Plugin[ExamplePluginAutoConfig]):
         self.logger.info("Setting up ExamplePluginAuto.")
 
     def run(self) -> None:
-        self.logger.info(
-            "Running ExamplePluginAuto with option: %s", self.config.example_option
-        )
+        self.logger.info("Running ExamplePluginAuto with option: %s", self.config.example_option)
 
     def teardown(self) -> None:
         self.logger.info("Tearing down ExamplePluginAuto.")

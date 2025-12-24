@@ -1,14 +1,13 @@
 import importlib
 import pathlib
 import sys
-from typing import Optional
 
 
 class ModuleLoader:
     """Utility class to dynamically load Python modules from directories."""
 
     @staticmethod
-    def load_from_directory(path: str, package: Optional[str] = None) -> None:
+    def load_from_directory(path: str, package: str | None = None) -> None:
         """
         Import all Python modules from the given directory.
 

@@ -1,8 +1,8 @@
-from .schema import PluginConfig, NotifierConfig, CoreConfig, LoggingConfig
+from .schema import CoreConfig, LoggingConfig, NotifierConfig, PluginConfig
 
 __all__ = [
-    "PluginConfig",
-    "NotifierConfig",
     "CoreConfig",
     "LoggingConfig",
+    "NotifierConfig",
+    "PluginConfig",
 ]

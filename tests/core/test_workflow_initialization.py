@@ -1,5 +1,5 @@
-from unittest.mock import Mock, patch
 import logging
+from unittest.mock import Mock, patch
 
 from opsflow.core.workflow import Workflow
 

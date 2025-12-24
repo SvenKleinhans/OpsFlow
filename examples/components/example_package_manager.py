@@ -1,9 +1,8 @@
-from opsflow.core.system import PackageManager
 from opsflow.core.models import Result, Severity
+from opsflow.core.system import PackageManager
 
 
 class ExamplePackageManager(PackageManager):
-
     def update(self, dry_run: bool = False) -> Result | None:
         if dry_run:
             print("Simulating package list update...")

@@ -1,5 +1,5 @@
-from opsflow.core.notifier import Notifier
 from opsflow.core.config import NotifierConfig
+from opsflow.core.notifier import Notifier
 
 
 class DummyNotifierConfig(NotifierConfig):

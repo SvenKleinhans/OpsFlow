@@ -3,7 +3,6 @@ from ..dummies.notifier.dummy_notifier import (
     DummyNotifier,
     DummyNotifierConfig,
 )
-
 from ..support.component_spec import ComponentSpec
 
 

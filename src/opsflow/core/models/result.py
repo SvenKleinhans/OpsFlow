@@ -1,7 +1,6 @@
+import threading
 from dataclasses import dataclass
 from enum import Enum
-import threading
-from typing import List, Optional
 
 
 class Severity(Enum):
@@ -36,10 +35,10 @@ class ResultCollector:
 
     def __init__(self):
         """Initializes an empty ResultCollector."""
-        self.results: List[Result] = []
+        self.results: list[Result] = []
         self._lock = threading.Lock()
 
-    def add(self, result: Optional[Result]) -> None:
+    def add(self, result: Result | None) -> None:
         """Adds a result to the collection.
 
         Args:
@@ -49,7 +48,7 @@ class ResultCollector:
             with self._lock:
                 self.results.append(result)
 
-    def add_all(self, results: List[Result]) -> None:
+    def add_all(self, results: list[Result]) -> None:
         """Adds multiple results to the collection.
 
         Args:
@@ -58,7 +57,7 @@ class ResultCollector:
         with self._lock:
             self.results.extend(results)
 
-    def all_results(self) -> List[Result]:
+    def all_results(self) -> list[Result]:
         """
         Retrieves all collected results.
 

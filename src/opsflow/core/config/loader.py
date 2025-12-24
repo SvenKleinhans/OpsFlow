@@ -1,10 +1,9 @@
-from typing import Optional
-
 import yaml
-from .schema import CoreConfig
-from ..plugin import PluginRegistry
+
 from ..notifier import NotifierRegistry
+from ..plugin import PluginRegistry
 from ..registry.entry import RegistryEntry
+from .schema import CoreConfig
 
 
 class ConfigLoader:
@@ -30,26 +29,20 @@ class ConfigLoader:
             ValidationError: If the YAML content is invalid.
             ValueError: If an unknown plugin or notifier is referenced.
         """
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             raw = yaml.safe_load(f)
 
         # Validate top-level CoreConfig
         core = CoreConfig.model_validate(raw)
 
         # Load plugins and notifiers using the same helper method
-        core.plugins = ConfigLoader._load_entries(
-            raw.get("plugins"), PluginRegistry.entries
-        )
-        core.notifiers = ConfigLoader._load_entries(
-            raw.get("notifiers"), NotifierRegistry.entries
-        )
+        core.plugins = ConfigLoader._load_entries(raw.get("plugins"), PluginRegistry.entries)
+        core.notifiers = ConfigLoader._load_entries(raw.get("notifiers"), NotifierRegistry.entries)
 
         return core
 
     @staticmethod
-    def _load_entries(
-        entry_data: Optional[dict], entries: dict[str, RegistryEntry]
-    ) -> dict:
+    def _load_entries(entry_data: dict | None, entries: dict[str, RegistryEntry]) -> dict:
         """Create validated configuration objects from registry definitions.
 
         Maps raw YAML configuration data to validated configuration model

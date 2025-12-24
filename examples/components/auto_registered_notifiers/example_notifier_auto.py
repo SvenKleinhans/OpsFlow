@@ -2,8 +2,8 @@
 Example auto-registered notifier for demonstration purposes.
 """
 
-from opsflow.core.notifier import Notifier, NotifierRegistry
 from opsflow.core.config import NotifierConfig
+from opsflow.core.notifier import Notifier, NotifierRegistry
 
 
 class ExampleNotifierAutoConfig(NotifierConfig):

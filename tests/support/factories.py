@@ -1,4 +1,3 @@
-from typing import Optional
 from opsflow.core.factory.base import Factory
 from opsflow.core.models.context import Context
 from opsflow.core.registry.base import Registry
@@ -10,7 +9,7 @@ TestRegistry = Registry(default_config=dict, base_cls=object, kind="Test")
 
 
 def make_components_factory(logger):
-    def _make(*specs: ComponentSpec, ctx: Optional[Context] = None):
+    def _make(*specs: ComponentSpec, ctx: Context | None = None):
         TestRegistry.entries.clear()
 
         components_cfg = {}

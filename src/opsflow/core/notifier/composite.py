@@ -1,5 +1,3 @@
-from typing import List
-
 from .base import Notifier
 
 
@@ -8,7 +6,7 @@ class CompositeNotifier:
 
     def __init__(self):
         """Initializes an empty composite notifier."""
-        self._notifiers: List[Notifier] = []
+        self._notifiers: list[Notifier] = []
 
     def add_notifier(self, notifier: Notifier) -> None:
         """Registers a notifier backend.

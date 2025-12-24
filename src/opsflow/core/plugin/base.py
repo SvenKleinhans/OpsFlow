@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
 import logging
-from typing import TypeVar, Generic
+from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 from ..config import PluginConfig
 from ..models.context import Context

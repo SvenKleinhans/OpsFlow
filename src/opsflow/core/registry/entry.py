@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Type, Generic, TypeVar
+from typing import Generic, TypeVar
 
 _C = TypeVar("_C")  # Component type (Plugin, Notifier, etc.)
 _CFG = TypeVar("_CFG")  # Configuration type
@@ -20,6 +20,6 @@ class RegistryEntry(Generic[_C, _CFG]):
         description (str): Optional human-readable description of the component.
     """
 
-    component_cls: Type[_C]
-    config_cls: Type[_CFG]
+    component_cls: type[_C]
+    config_cls: type[_CFG]
     description: str = ""

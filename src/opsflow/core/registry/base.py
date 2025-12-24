@@ -1,4 +1,5 @@
-from typing import Callable, Dict, Generic, Type, TypeVar, Optional
+from collections.abc import Callable
+from typing import Generic, TypeVar
 
 from .entry import RegistryEntry
 
@@ -22,8 +23,8 @@ class Registry(Generic[_C, _CFG]):
 
     def __init__(
         self,
-        base_cls: Type[_C],
-        default_config: Type[_CFG],
+        base_cls: type[_C],
+        default_config: type[_CFG],
         kind: str,
     ) -> None:
         """
@@ -34,16 +35,16 @@ class Registry(Generic[_C, _CFG]):
             default_config: Default configuration class used if none is provided.
             kind: Human-readable component kind used in error messages.
         """
-        self._base_cls: Type[_C] = base_cls
-        self._default_config: Type[_CFG] = default_config
+        self._base_cls: type[_C] = base_cls
+        self._default_config: type[_CFG] = default_config
         self._kind: str = kind
-        self.entries: Dict[str, RegistryEntry[_C, _CFG]] = {}
+        self.entries: dict[str, RegistryEntry[_C, _CFG]] = {}
 
     def register(
         self,
-        config: Optional[Type[_CFG]] = None,
+        config: type[_CFG] | None = None,
         description: str = "",
-    ) -> Callable[[Type[_C]], Type[_C]]:
+    ) -> Callable[[type[_C]], type[_C]]:
         """
         Decorator for registering a component class.
 
@@ -56,7 +57,7 @@ class Registry(Generic[_C, _CFG]):
             A class decorator that registers the decorated component.
         """
 
-        def wrapper(cls: Type[_C]) -> Type[_C]:
+        def wrapper(cls: type[_C]) -> type[_C]:
             self.register_class(cls, config=config, description=description)
             return cls
 
@@ -64,8 +65,8 @@ class Registry(Generic[_C, _CFG]):
 
     def register_class(
         self,
-        cls: Type[_C],
-        config: Optional[Type[_CFG]],
+        cls: type[_C],
+        config: type[_CFG] | None,
         description: str = "",
     ) -> None:
         """
@@ -83,9 +84,7 @@ class Registry(Generic[_C, _CFG]):
                 or if a component with the same name is already registered.
         """
         if not issubclass(cls, self._base_cls):
-            raise TypeError(
-                f"{cls.__name__} must inherit from {self._base_cls.__name__}"
-            )
+            raise TypeError(f"{cls.__name__} must inherit from {self._base_cls.__name__}")
 
         name = getattr(cls, "name", None)
         if not name or name == "unnamed":

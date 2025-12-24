@@ -1,10 +1,10 @@
 import logging
 
+from ..config.schema import CoreConfig
+from ..factory.base import Factory
+from ..models.context import Context
 from .base import Plugin
 from .registry import PluginRegistry
-from ..factory.base import Factory
-from ..config.schema import CoreConfig
-from ..models.context import Context
 
 
 class PluginFactory(Factory[Plugin]):

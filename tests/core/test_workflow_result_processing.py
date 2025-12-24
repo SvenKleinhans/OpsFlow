@@ -1,4 +1,5 @@
 from unittest.mock import Mock, patch
+
 from opsflow.core.workflow import Workflow
 
 
@@ -39,9 +40,7 @@ class TestWorkflowResultProcessing:
         workflow = Workflow(config=config_with_plugins)
 
         # Make notifier raise an error
-        workflow._notifier.notify = Mock(
-            side_effect=RuntimeError("Notification failed")
-        )
+        workflow._notifier.notify = Mock(side_effect=RuntimeError("Notification failed"))
 
         # Should not raise, but log the error
         workflow.process_results()

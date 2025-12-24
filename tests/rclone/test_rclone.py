@@ -1,11 +1,12 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+from opsflow.core.models import Severity
 from opsflow.plugins.rclone import (
+    RCloneAction,
     RClonePlugin,
     RClonePluginConfig,
     RCloneTask,
-    RCloneAction,
 )
-from opsflow.core.models import Severity
 
 
 def fake_command_result(success=True):

@@ -1,6 +1,6 @@
-from opsflow.core.workflow import Workflow
 from opsflow.core.models import Result, Severity
 from opsflow.core.models.context import Context
+from opsflow.core.workflow import Workflow
 
 
 class TestWorkflowContextSharing:

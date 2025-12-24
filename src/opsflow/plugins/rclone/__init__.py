@@ -1,10 +1,10 @@
+from .config import RCloneAction, RCloneOptions, RClonePluginConfig, RCloneTask
 from .rclone import RClonePlugin
-from .config import RClonePluginConfig, RCloneTask, RCloneAction, RCloneOptions
 
 __all__ = [
+    "RCloneAction",
+    "RCloneOptions",
     "RClonePlugin",
     "RClonePluginConfig",
     "RCloneTask",
-    "RCloneAction",
-    "RCloneOptions",
 ]

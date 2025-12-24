@@ -1,20 +1,20 @@
+from pathlib import Path
+
 import yaml
 from pydantic import BaseModel
-from pathlib import Path
 
 from opsflow.core.config import (
     CoreConfig,
     LoggingConfig,
-    PluginConfig,
     NotifierConfig,
-)
-
-from opsflow.plugins.rclone import (
-    RClonePluginConfig,
-    RCloneTask,
-    RCloneAction,
+    PluginConfig,
 )
 from opsflow.notifiers.email import EmailNotifierConfig, SmtpSecurity
+from opsflow.plugins.rclone import (
+    RCloneAction,
+    RClonePluginConfig,
+    RCloneTask,
+)
 
 
 def create_yaml(model: BaseModel, name: str) -> None:

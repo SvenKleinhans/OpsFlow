@@ -1,13 +1,13 @@
 import pytest
 
-from ..dummies.notifier.raising_notifier import RaisingNotifier
-from ..dummies.notifier.recording_notifier import RecordingNotifier
+from opsflow.core.notifier.composite import CompositeNotifier
+
 from ..dummies.notifier.dummy_notifier import (
     DummyNotifier,
     DummyNotifierConfig,
 )
-
-from opsflow.core.notifier.composite import CompositeNotifier
+from ..dummies.notifier.raising_notifier import RaisingNotifier
+from ..dummies.notifier.recording_notifier import RecordingNotifier
 
 
 def test_composite_forwards_message_to_all_notifiers(logger):

@@ -1,7 +1,8 @@
 import os
+
+from opsflow.core.models import Result, Severity
 from opsflow.core.system import SystemManager
 from opsflow.core.utils import CommandRunner
-from opsflow.core.models import Result, Severity
 
 
 class UbuntuManager(SystemManager):

@@ -7,7 +7,6 @@ and notifiers from a directory using the module loader, without any manual regis
 
 from opsflow.core.workflow import Workflow
 
-
 # Create and run the workflow
 wf = Workflow(
     plugin_dir="components/auto_registered_plugins",

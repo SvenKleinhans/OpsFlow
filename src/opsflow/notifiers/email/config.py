@@ -1,5 +1,5 @@
-from typing import Optional
 from enum import Enum
+
 from pydantic import field_validator
 
 from opsflow.core.config import NotifierConfig
@@ -28,8 +28,8 @@ class EmailNotifierConfig(NotifierConfig):
     sender: str
     recipient: str
     security: SmtpSecurity = SmtpSecurity.NONE
-    password: Optional[str] = None
-    user: Optional[str] = None
+    password: str | None = None
+    user: str | None = None
 
     @classmethod
     @field_validator("port")

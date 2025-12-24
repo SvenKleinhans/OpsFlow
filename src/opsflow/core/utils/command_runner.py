@@ -1,7 +1,6 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from ..models.result import Result, Severity
 
@@ -9,7 +8,7 @@ from ..models.result import Result, Severity
 class CommandRunner:
     """Utility class for executing shell commands with logging support."""
 
-    _logger: Optional[logging.Logger] = None
+    _logger: logging.Logger | None = None
     _dry_run: bool = False
 
     @classmethod
@@ -30,8 +29,8 @@ class CommandRunner:
     def run(
         cls,
         command: list[str],
-        env: Optional[dict[str, str]] = None,
-        working_directory: Optional[Path] = None,
+        env: dict[str, str] | None = None,
+        working_directory: Path | None = None,
         check: bool = False,
         use_sudo: bool = True,
     ) -> subprocess.CompletedProcess:
@@ -93,10 +92,10 @@ class CommandRunner:
         cls,
         command: list[str],
         step: str,
-        env: Optional[dict[str, str]] = None,
-        working_directory: Optional[Path] = None,
+        env: dict[str, str] | None = None,
+        working_directory: Path | None = None,
         use_sudo: bool = True,
-    ) -> Optional[Result]:
+    ) -> Result | None:
         """Executes a command and returns a Result object on failure.
 
         Args:

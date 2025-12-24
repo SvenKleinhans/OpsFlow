@@ -1,6 +1,7 @@
 from unittest.mock import Mock, patch
-from opsflow.core.workflow import Workflow
+
 from opsflow.core.models import Severity
+from opsflow.core.workflow import Workflow
 
 
 class TestWorkflowErrorHandling:
@@ -16,9 +17,7 @@ class TestWorkflowErrorHandling:
 
             # Error should be recorded in results
             error_results = [
-                r
-                for r in workflow._result_collector.results
-                if "module_load:plugins" in r.step
+                r for r in workflow._result_collector.results if "module_load:plugins" in r.step
             ]
             assert len(error_results) > 0
 
@@ -32,9 +31,7 @@ class TestWorkflowErrorHandling:
 
             # Error should be recorded in results
             error_results = [
-                r
-                for r in workflow._result_collector.results
-                if "module_load:notifiers" in r.step
+                r for r in workflow._result_collector.results if "module_load:notifiers" in r.step
             ]
             assert len(error_results) > 0
 
@@ -50,9 +47,7 @@ class TestWorkflowErrorHandling:
 
         workflow.run_plugins()
 
-        error_results = [
-            r for r in workflow._result_collector.results if "setup" in r.step
-        ]
+        error_results = [r for r in workflow._result_collector.results if "setup" in r.step]
         assert len(error_results) > 0
 
     def test_workflow_continues_after_plugin_teardown_error(self, config):

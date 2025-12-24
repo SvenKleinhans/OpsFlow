@@ -1,17 +1,16 @@
 import logging
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Optional, List
 
-from ..models.result import Result, Severity
 from ..models.context import Context
+from ..models.result import Result, Severity
 
 
 class PackageManager(ABC):
     """Abstract base class for package management operations."""
 
     @abstractmethod
-    def update(self, dry_run: bool = False) -> Optional[Result]:
+    def update(self, dry_run: bool = False) -> Result | None:
         """Update package metadata.
 
         Args:
@@ -22,7 +21,7 @@ class PackageManager(ABC):
         """
 
     @abstractmethod
-    def upgrade(self, dry_run: bool = False) -> Optional[Result]:
+    def upgrade(self, dry_run: bool = False) -> Result | None:
         """Upgrade installed packages.
 
         Args:
@@ -39,8 +38,8 @@ class SystemManager(ABC):
     def __init__(
         self,
         pkg_manager: PackageManager,
-        pre_update: Optional[List[Callable]] = None,
-        post_update: Optional[List[Callable]] = None,
+        pre_update: list[Callable] | None = None,
+        post_update: list[Callable] | None = None,
     ):
         """Initialize the system manager.
 
@@ -137,9 +136,7 @@ class SystemManager(ABC):
             message = "A new stable OS release is available"
             self.logger.warning(message)
             self.ctx.add_result(
-                Result(
-                    step="OS Upgrade Check", severity=Severity.WARNING, message=message
-                )
+                Result(step="OS Upgrade Check", severity=Severity.WARNING, message=message)
             )
 
     @abstractmethod

@@ -1,11 +1,11 @@
-from opsflow.core.workflow import Workflow
-from opsflow.core.plugin import PluginRegistry
 from opsflow.core.models import Severity
+from opsflow.core.plugin import PluginRegistry
+from opsflow.core.workflow import Workflow
 
 # Import test dummies
 from ..dummies.plugins import (
-    PluginA,
     FailingPlugin,
+    PluginA,
     PluginAConfig,
 )
 
@@ -57,9 +57,7 @@ class TestWorkflowPluginExecution:
         workflow.run_plugins()
 
         results = workflow._result_collector.results
-        assert (
-            len(results) >= 0
-        )  # Plugins may have results or not depending on implementation
+        assert len(results) >= 0  # Plugins may have results or not depending on implementation
 
     def test_workflow_handles_plugin_execution_errors(self, config):
         """Workflow should handle exceptions from plugin execution."""
@@ -76,8 +74,6 @@ class TestWorkflowPluginExecution:
 
         # Error should be collected in results
         error_results = [
-            r
-            for r in workflow._result_collector.results
-            if r.severity == Severity.ERROR
+            r for r in workflow._result_collector.results if r.severity == Severity.ERROR
         ]
         assert len(error_results) > 0

@@ -1,9 +1,9 @@
-from typing import Any, Generator, Generic, TypeVar, Dict, Optional
 import logging
+from collections.abc import Generator
+from typing import Any, Generic, TypeVar
 
-from ..registry.base import Registry
 from ..models.context import Context
-
+from ..registry.base import Registry
 
 _C = TypeVar("_C")  # Component type
 
@@ -14,9 +14,9 @@ class Factory(Generic[_C]):
     def __init__(
         self,
         registry: Registry,
-        components_cfg: Dict[str, Any],
+        components_cfg: dict[str, Any],
         logger: logging.Logger,
-        ctx: Optional[Context] = None,
+        ctx: Context | None = None,
     ):
         """
         Initialize the Factory.

@@ -1,9 +1,9 @@
 import logging
 
+from ..config.schema import CoreConfig
+from ..factory.base import Factory
 from .base import Notifier
 from .registry import NotifierRegistry
-from ..factory.base import Factory
-from ..config.schema import CoreConfig
 
 
 class NotifierFactory(Factory[Notifier]):
@@ -17,6 +17,4 @@ class NotifierFactory(Factory[Notifier]):
             config (CoreConfig): Configuration containing notifier settings.
             logger (logging.Logger): Logger instance for notifier logging.
         """
-        super().__init__(
-            registry=NotifierRegistry, components_cfg=config.notifiers, logger=logger
-        )
+        super().__init__(registry=NotifierRegistry, components_cfg=config.notifiers, logger=logger)

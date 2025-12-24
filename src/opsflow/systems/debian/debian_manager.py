@@ -1,14 +1,13 @@
-from typing import Optional
 from urllib import error, request
 
-from opsflow.core.system import SystemManager
 from opsflow.core.models import Result, Severity
+from opsflow.core.system import SystemManager
 
 
 class DebianManager(SystemManager):
     def _is_reboot_required(self) -> bool:
         try:
-            with open("/var/run/reboot-required", "r"):
+            with open("/var/run/reboot-required"):
                 return True
         except FileNotFoundError:
             return False
@@ -20,7 +19,7 @@ class DebianManager(SystemManager):
             return latest.lower() != current.lower()
         return False
 
-    def _get_os_codename(self) -> Optional[str]:
+    def _get_os_codename(self) -> str | None:
         """Return the OS version codename from /etc/os-release.
 
         Reads the local `/etc/os-release` file and extracts the value of
@@ -54,7 +53,7 @@ class DebianManager(SystemManager):
             )
             return None
 
-    def _get_latest_stable_release(self) -> Optional[str]:
+    def _get_latest_stable_release(self) -> str | None:
         """Return the codename of the latest Debian stable release.
 
         Fetches the Debian stable `Release` file and extracts the `Codename`

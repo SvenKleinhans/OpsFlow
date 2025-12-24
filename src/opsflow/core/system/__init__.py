@@ -1,3 +1,3 @@
-from .base import SystemManager, PackageManager
+from .base import PackageManager, SystemManager
 
-__all__ = ["SystemManager", "PackageManager"]
+__all__ = ["PackageManager", "SystemManager"]

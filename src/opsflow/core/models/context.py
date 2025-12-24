@@ -1,7 +1,5 @@
-from typing import Optional, List
-
-from .result import Result, ResultCollector
 from ..utils.command_runner import CommandRunner
+from .result import Result, ResultCollector
 
 
 class Context:
@@ -15,7 +13,7 @@ class Context:
         self.dry_run = dry_run
         self.cmd = CommandRunner
 
-    def add_result(self, result: Optional[Result]) -> None:
+    def add_result(self, result: Result | None) -> None:
         """
         Adds a result to the context's result collector.
 
@@ -24,7 +22,7 @@ class Context:
         """
         self._result_collector.add(result)
 
-    def add_results(self, results: List[Result]) -> None:
+    def add_results(self, results: list[Result]) -> None:
         """
         Adds multiple results to the context's result collector.
 
@@ -33,7 +31,7 @@ class Context:
         """
         self._result_collector.add_all(results)
 
-    def all_results(self) -> List[Result]:
+    def all_results(self) -> list[Result]:
         """
         Retrieves all results from the context's result collector.
 

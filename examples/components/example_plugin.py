@@ -1,5 +1,5 @@
-from opsflow.core.plugin import Plugin
 from opsflow.core.config import PluginConfig
+from opsflow.core.plugin import Plugin
 
 
 class ExamplePluginConfig(PluginConfig):
@@ -20,9 +20,7 @@ class ExamplePlugin(Plugin[ExamplePluginConfig]):
 
     def run(self) -> None:
         """Run the example plugin's main task."""
-        self.logger.info(
-            "Running ExamplePlugin with option: %s", self.config.example_option
-        )
+        self.logger.info("Running ExamplePlugin with option: %s", self.config.example_option)
         # Implement the main logic of the plugin here
 
     def teardown(self) -> None:

@@ -1,6 +1,7 @@
 from unittest.mock import Mock, patch
-from opsflow.core.workflow import Workflow
+
 from opsflow.core.models import Result, Severity
+from opsflow.core.workflow import Workflow
 
 
 class TestWorkflowFullRun:

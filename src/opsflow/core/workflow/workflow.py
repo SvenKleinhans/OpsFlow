@@ -1,21 +1,22 @@
 import sys
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import current_thread
-from typing import Callable, List, Optional
 
 from opsflow.core.utils.report_formatter import ReportFormatter
+
+from ..config.loader import ConfigLoader
+from ..config.schema import CoreConfig
 from ..models.context import Context
-from ..models.result import ResultCollector, Result, Severity
+from ..models.result import Result, ResultCollector, Severity
+from ..notifier.composite import CompositeNotifier
+from ..notifier.factory import NotifierFactory
 from ..plugin.base import Plugin
 from ..plugin.factory import PluginFactory
 from ..system.base import SystemManager
-from ..config.loader import ConfigLoader
-from ..config.schema import CoreConfig
-from ..notifier.composite import CompositeNotifier
-from ..notifier.factory import NotifierFactory
-from ..utils.module_loader import ModuleLoader
-from ..utils.logger_setup import setup_logger
 from ..utils.command_runner import CommandRunner
+from ..utils.logger_setup import setup_logger
+from ..utils.module_loader import ModuleLoader
 
 
 class Workflow:
@@ -26,11 +27,11 @@ class Workflow:
 
     def __init__(
         self,
-        system_manager: Optional[SystemManager] = None,
-        config: Optional[CoreConfig] = None,
-        config_path: Optional[str] = None,
-        plugin_dir: Optional[str] = None,
-        notifier_dir: Optional[str] = None,
+        system_manager: SystemManager | None = None,
+        config: CoreConfig | None = None,
+        config_path: str | None = None,
+        plugin_dir: str | None = None,
+        notifier_dir: str | None = None,
     ):
         """Initialize the workflow orchestrator.
 
@@ -94,7 +95,7 @@ class Workflow:
 
         # Build notifiers and plugins
         self._notifier: CompositeNotifier = self._build_notifier()
-        self._plugins: List[Plugin] = self._build_plugins()
+        self._plugins: list[Plugin] = self._build_plugins()
         self._logger.debug("Workflow initialized with %d plugins", len(self._plugins))
 
     def run_system_update(self) -> None:
@@ -131,23 +132,17 @@ class Workflow:
             parallel (bool): If True, run plugins in parallel threads.
             max_workers (int): Maximum number of threads when running in parallel.
         """
-        self._logger.info(
-            "Running %d plugins (parallel=%s)...", len(self._plugins), parallel
-        )
+        self._logger.info("Running %d plugins (parallel=%s)...", len(self._plugins), parallel)
         if not parallel:
             for plugin in self._plugins:
                 self._run_single_plugin(plugin)
             return
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {
-                executor.submit(self._run_single_plugin, p): p for p in self._plugins
-            }
+            futures = {executor.submit(self._run_single_plugin, p): p for p in self._plugins}
             for _ in as_completed(futures):
                 # _run_single_plugin handles exceptions and results
-                self._logger.debug(
-                    "Plugin future completed in thread %s", current_thread().name
-                )
+                self._logger.debug("Plugin future completed in thread %s", current_thread().name)
 
     def process_results(self) -> None:
         """Format all collected results and send a report via the notifier."""
@@ -179,18 +174,14 @@ class Workflow:
         name = plugin.name
 
         self._logger.debug("[%s] Plugin %s setup started", thread, name)
-        if not self._safe_call(
-            plugin.setup, step="setup", plugin=plugin, severity=Severity.ERROR
-        ):
+        if not self._safe_call(plugin.setup, step="setup", plugin=plugin, severity=Severity.ERROR):
             return
 
         self._logger.debug("[%s] Plugin %s run started", thread, name)
         self._safe_call(plugin.run, step="run", plugin=plugin, severity=Severity.ERROR)
 
         self._logger.debug("[%s] Plugin %s teardown started", thread, name)
-        self._safe_call(
-            plugin.teardown, step="teardown", plugin=plugin, severity=Severity.WARNING
-        )
+        self._safe_call(plugin.teardown, step="teardown", plugin=plugin, severity=Severity.WARNING)
 
     def _safe_call(
         self,
@@ -230,7 +221,7 @@ class Workflow:
             return False
 
     @staticmethod
-    def _load_config(config_path: Optional[str]) -> CoreConfig:
+    def _load_config(config_path: str | None) -> CoreConfig:
         """Load the configuration from the specified file or command-line argument.
 
         Args:
@@ -280,16 +271,14 @@ class Workflow:
             self._logger.debug("Notifier added: %s", type(notifier).__name__)
         return composite
 
-    def _build_plugins(self) -> List[Plugin]:
+    def _build_plugins(self) -> list[Plugin]:
         """Instantiate all enabled plugins with a shared execution context.
 
         Returns:
             List[Plugin]: List of plugin instances ready for execution.
         """
         self._logger.debug("Building plugins")
-        ctx = Context(
-            result_collector=self._result_collector, dry_run=self._config.dry_run
-        )
+        ctx = Context(result_collector=self._result_collector, dry_run=self._config.dry_run)
         factory = PluginFactory(config=self._config, ctx=ctx, logger=self._logger)
         plugins = list(factory.create_all())
         self._logger.debug("Total plugins instantiated: %d", len(plugins))

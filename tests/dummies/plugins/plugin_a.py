@@ -1,6 +1,6 @@
-from opsflow.core.plugin import Plugin
-from opsflow.core.models import Result, Severity
 from opsflow.core.config import PluginConfig
+from opsflow.core.models import Result, Severity
+from opsflow.core.plugin import Plugin
 
 
 class PluginAConfig(PluginConfig):

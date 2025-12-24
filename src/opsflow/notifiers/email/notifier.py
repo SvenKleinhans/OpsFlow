@@ -2,6 +2,7 @@ from email.message import EmailMessage
 from smtplib import SMTP, SMTP_SSL
 
 from opsflow.core.notifier import Notifier
+
 from .config import EmailNotifierConfig, SmtpSecurity
 
 

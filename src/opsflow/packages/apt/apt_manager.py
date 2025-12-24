@@ -1,26 +1,20 @@
-from typing import Optional
-
-from opsflow.core.system.base import PackageManager
 from opsflow.core.models import Result
+from opsflow.core.system.base import PackageManager
 from opsflow.core.utils import CommandRunner
 
 
 class AptManager(PackageManager):
-    def upgrade(self, dry_run: bool = False) -> Optional[Result]:
-        result = self._run_apt(
-            ["apt-get", "dist-upgrade", "-y"], "System Upgrade", dry_run
-        )
+    def upgrade(self, dry_run: bool = False) -> Result | None:
+        result = self._run_apt(["apt-get", "dist-upgrade", "-y"], "System Upgrade", dry_run)
         if result:
             return result
-        return self._run_apt(
-            ["apt-get", "autoremove", "-y"], "Remove Unused Packages", dry_run
-        )
+        return self._run_apt(["apt-get", "autoremove", "-y"], "Remove Unused Packages", dry_run)
 
-    def update(self, dry_run: bool = False) -> Optional[Result]:
+    def update(self, dry_run: bool = False) -> Result | None:
         return CommandRunner.run_as_result(["apt-get", "update"], "System Update")
 
     @staticmethod
-    def _run_apt(args: list[str], step: str, dry_run: bool) -> Optional[Result]:
+    def _run_apt(args: list[str], step: str, dry_run: bool) -> Result | None:
         """Run an apt command and return the result.
 
         Optionally executes the command in simulation mode when `dry_run`

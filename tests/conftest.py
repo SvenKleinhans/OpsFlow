@@ -1,13 +1,12 @@
-import pytest
 import logging
+
+import pytest
 
 from opsflow.core.config.schema import CoreConfig, LoggingConfig
 from opsflow.core.models.context import Context
 from opsflow.core.models.result import ResultCollector
 from opsflow.core.notifier.registry import NotifierRegistry
 from opsflow.core.plugin.registry import PluginRegistry
-
-from .support.factories import make_components_factory, TestRegistry
 
 # Import test dummies
 from .dummies.plugins import (
@@ -16,6 +15,7 @@ from .dummies.plugins import (
     PluginB,
     PluginBConfig,
 )
+from .support.factories import TestRegistry, make_components_factory
 
 
 @pytest.fixture

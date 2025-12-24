@@ -1,4 +1,3 @@
-from typing import Dict
 from pydantic import BaseModel, Field
 
 
@@ -46,5 +45,5 @@ class CoreConfig(BaseModel):
 
     dry_run: bool = False
     logging: LoggingConfig = LoggingConfig()
-    notifiers: Dict[str, NotifierConfig] = Field(default_factory=dict)
-    plugins: Dict[str, PluginConfig] = Field(default_factory=dict)
+    notifiers: dict[str, NotifierConfig] = Field(default_factory=dict)
+    plugins: dict[str, PluginConfig] = Field(default_factory=dict)

@@ -1,19 +1,21 @@
 import pytest
 from pydantic import ValidationError
 
+from opsflow.core.config import CoreConfig, NotifierConfig, PluginConfig
+
 # product code
 from opsflow.core.config.loader import ConfigLoader
-from opsflow.core.config import CoreConfig, PluginConfig, NotifierConfig
-from opsflow.core.plugin import PluginRegistry
 from opsflow.core.notifier.registry import NotifierRegistry
+from opsflow.core.plugin import PluginRegistry
 
-# dummies (test-only components)
-from ..dummies.plugins.plugin_a import PluginA, PluginAConfig
-from ..dummies.plugins.plugin_b import PluginB, PluginBConfig
 from ..dummies.notifier.dummy_notifier import (
     DummyNotifier,
     DummyNotifierConfig,
 )
+
+# dummies (test-only components)
+from ..dummies.plugins.plugin_a import PluginA, PluginAConfig
+from ..dummies.plugins.plugin_b import PluginB, PluginBConfig
 
 
 @pytest.fixture(autouse=True)

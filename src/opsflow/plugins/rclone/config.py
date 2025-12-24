@@ -1,6 +1,8 @@
 from enum import Enum
-from typing import List, Optional, Any
+from typing import Any
+
 from pydantic import BaseModel, Field
+
 from opsflow.core.config import PluginConfig
 
 
@@ -22,11 +24,11 @@ class RCloneTask(BaseModel):
     """Definition of a single RClone task."""
 
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     action: RCloneAction
     src: str
     dest: str
-    options: Optional[RCloneOptions] = None
+    options: RCloneOptions | None = None
 
 
 class RClonePluginConfig(PluginConfig):
@@ -34,5 +36,5 @@ class RClonePluginConfig(PluginConfig):
 
     name: str = "RClone"
     max_workers: int = 4
-    config_file: Optional[str] = None
-    tasks: List[RCloneTask] = Field(default_factory=list)
+    config_file: str | None = None
+    tasks: list[RCloneTask] = Field(default_factory=list)

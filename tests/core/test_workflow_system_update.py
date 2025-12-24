@@ -1,8 +1,8 @@
 from unittest.mock import Mock
 
+from opsflow.core.models import Result, Severity
 from opsflow.core.system import PackageManager, SystemManager
 from opsflow.core.workflow import Workflow
-from opsflow.core.models import Result, Severity
 
 
 class TestWorkflowSystemUpdate:
@@ -30,9 +30,7 @@ class TestWorkflowSystemUpdate:
                 )
 
             def upgrade(self, dry_run: bool = False) -> Result | None:
-                return Result(
-                    step="package_upgrade", severity=Severity.INFO, message="Upgraded"
-                )
+                return Result(step="package_upgrade", severity=Severity.INFO, message="Upgraded")
 
         class MockManager(SystemManager):
             def _is_reboot_required(self) -> bool:
@@ -58,8 +56,6 @@ class TestWorkflowSystemUpdate:
         workflow.run_system_update()
 
         error_results = [
-            r
-            for r in workflow._result_collector.results
-            if r.severity == Severity.ERROR
+            r for r in workflow._result_collector.results if r.severity == Severity.ERROR
         ]
         assert len(error_results) > 0

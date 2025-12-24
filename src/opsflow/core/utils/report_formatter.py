@@ -1,12 +1,10 @@
-from typing import List
-
 from ..models import Result, Severity
 
 
 class ReportFormatter:
     """Formats workflow results into a report."""
 
-    def __init__(self, results: List[Result]) -> None:
+    def __init__(self, results: list[Result]) -> None:
         """Initializes the Report Formatter with a list of results.
 
         Args:

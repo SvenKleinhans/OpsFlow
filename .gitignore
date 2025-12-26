@@ -3,9 +3,11 @@
 .vscode
 .ruff_cache
 .pytest_cache
+.coverage
 __pycache__
 *.pyc
 *.pyo
 *.pyd
 *.env
 *.log
+*.xml

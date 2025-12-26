@@ -82,6 +82,10 @@ xfail_strict = true
 [tool.coverage.run]
 branch = true
 source = ["opsflow"]
+omit = [
+    "tests/*",
+    "**/__init__.py",
+]
 
 [tool.ruff]
 line-length = 100

@@ -3,7 +3,7 @@ from smtplib import SMTP, SMTP_SSL
 
 from opsflow.core.notifier import Notifier
 
-from .config import EmailNotifierConfig, SmtpSecurity
+from .email_config import EmailNotifierConfig, SmtpSecurity
 
 
 class EmailNotifier(Notifier[EmailNotifierConfig]):
@@ -26,7 +26,7 @@ class EmailNotifier(Notifier[EmailNotifierConfig]):
 
         msg = EmailMessage()
         msg["From"] = self.config.sender
-        msg["To"] = self.config.recipient
+        msg["To"] = ", ".join(self.config.recipient)
         msg["Subject"] = subject
         msg.set_content(message)
 

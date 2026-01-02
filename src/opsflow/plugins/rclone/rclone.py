@@ -8,7 +8,7 @@ import rclone as rc_adapter
 from opsflow.core.models import Result, Severity
 from opsflow.core.plugin import Plugin
 
-from .config import RCloneAction, RClonePluginConfig, RCloneTask
+from .rclone_config import RCloneAction, RClonePluginConfig, RCloneTask
 
 
 class RClonePlugin(Plugin[RClonePluginConfig]):
@@ -35,10 +35,13 @@ class RClonePlugin(Plugin[RClonePluginConfig]):
             self.logger.info("No rclone tasks configured.")
             return
 
-        self.logger.debug(f"Starting ThreadPoolExecutor with max_workers={self.config.max_workers}")
+        self.logger.debug(
+            f"Starting ThreadPoolExecutor with max_workers={self.config.max_workers}"
+        )
         with ThreadPoolExecutor(max_workers=self.config.max_workers) as executor:
             future_to_task = {
-                executor.submit(self._run_task, task): task for task in self.config.tasks
+                executor.submit(self._run_task, task): task
+                for task in self.config.tasks
             }
             for future in as_completed(future_to_task):
                 task = future_to_task[future]
@@ -49,7 +52,9 @@ class RClonePlugin(Plugin[RClonePluginConfig]):
                         f"Task '{task.name}'{desc} completed successfully {task.src} → {task.dest}"
                     )
                 except Exception as e:
-                    self.logger.exception(f"Unhandled exception in task '{task.name}'{desc}: {e}")
+                    self.logger.exception(
+                        f"Unhandled exception in task '{task.name}'{desc}: {e}"
+                    )
 
     def _run_task(self, task: RCloneTask) -> rc_adapter.CommandResult | None:
         """
@@ -61,12 +66,16 @@ class RClonePlugin(Plugin[RClonePluginConfig]):
         Returns:
             Optional[CommandResult]: Result of the rclone command.
         """
-        step = f"RClone {task.action.value.capitalize()} - {task.name or 'Unnamed Task'}"
+        step = (
+            f"RClone {task.action.value.capitalize()} - {task.name or 'Unnamed Task'}"
+        )
         desc = f" ({task.description})" if task.description else ""
         self.logger.debug(f"Starting task '{task.name}'{desc} {task.src} → {task.dest}")
 
         rc_config = rc_adapter.RCloneConfig(
-            config_file=(Path(self.config.config_file) if self.config.config_file else None),
+            config_file=(
+                Path(self.config.config_file) if self.config.config_file else None
+            ),
             default_flags=self._default_flags_from_ctx(),
         )
         rc = rc_adapter.RClone(rc_config)
@@ -86,7 +95,9 @@ class RClonePlugin(Plugin[RClonePluginConfig]):
             return cmd_result
 
         except Exception as e:
-            self.logger.exception(f"Error executing RClone task '{task.name}'{desc}: {e}")
+            self.logger.exception(
+                f"Error executing RClone task '{task.name}'{desc}: {e}"
+            )
             self._add_result(step, None, f"Exception: {e}")
             return None
 
@@ -143,7 +154,9 @@ class RClonePlugin(Plugin[RClonePluginConfig]):
         plugin_result = Result(step=step_name, severity=severity, message=message)
         with self._lock:
             self.ctx.add_result(plugin_result)
-            self.logger.debug(f"Result added for step '{step_name}' with severity {severity.name}")
+            self.logger.debug(
+                f"Result added for step '{step_name}' with severity {severity.name}"
+            )
 
     @staticmethod
     def _sync(rc: rc_adapter.RClone, task: RCloneTask) -> rc_adapter.CommandResult:

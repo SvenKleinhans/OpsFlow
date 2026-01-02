@@ -15,7 +15,7 @@ OpsFlow is a modular automation framework for orchestrating operational tasks, m
 
 # Dependencies
 
-OpsFlow requires Python 3.13 or higher. The core dependencies are:
+OpsFlow requires Python 3.10 or higher. The core dependencies are:
 
 - `pydantic` — for configuration models and validation
 - `PyYAML` — for YAML-based workflow configuration

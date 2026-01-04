@@ -11,6 +11,16 @@ class DebianManager(SystemManager):
                 return True
         except FileNotFoundError:
             return False
+        except Exception as e:
+            self.logger.exception("Failed to read /var/run/reboot-required")
+            self.ctx.add_result(
+                Result(
+                    step="Reboot check",
+                    severity=Severity.ERROR,
+                    message=f"Failed to read /var/run/reboot-required: {e}",
+                )
+            )
+            return False
 
     def _is_new_stable_os_available(self) -> bool:
         latest = self._get_latest_stable_release()
@@ -38,7 +48,7 @@ class DebianManager(SystemManager):
                     (
                         line.split("=", 1)[1].strip()
                         for line in f
-                        if line.startswith("VERSION_CODENAME=")
+                        if line.strip().startswith("VERSION_CODENAME=")
                     ),
                     None,
                 )
@@ -73,7 +83,7 @@ class DebianManager(SystemManager):
                     (
                         line.split(":", 1)[1].strip()
                         for line in r.read().decode().splitlines()
-                        if line.startswith("Codename:")
+                        if line.strip().startswith("Codename:")
                     ),
                     None,
                 )

@@ -1,4 +1,5 @@
 import logging
+from typing import Type, TypeVar
 
 import pytest
 
@@ -7,6 +8,7 @@ from opsflow.core.models.context import Context
 from opsflow.core.models.result import ResultCollector
 from opsflow.core.notifier.registry import NotifierRegistry
 from opsflow.core.plugin.registry import PluginRegistry
+from opsflow.core.system.base import SystemManager
 
 # Import test dummies
 from .dummies.plugins import (
@@ -68,3 +70,19 @@ def config_with_plugins(config):
         PluginB.name: PluginBConfig(flag=True, enabled=True),
     }
     return config
+
+
+TManager = TypeVar("TManager", bound=SystemManager)
+
+
+@pytest.fixture
+def make_manager(context, logger):
+    """Create a manager instance without running full init"""
+
+    def _make(cls: Type[TManager]) -> TManager:
+        m = cls.__new__(cls)
+        m.logger = logger
+        m.ctx = context
+        return m
+
+    return _make

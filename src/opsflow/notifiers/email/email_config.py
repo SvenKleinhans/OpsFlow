@@ -32,14 +32,12 @@ class EmailNotifierConfig(NotifierConfig):
     password: str | None = None
     user: str | None = None
 
-    @classmethod
     @field_validator("port")
     def validate_port(cls, v: int) -> int:
         if v <= 0 or v > 65535:
             raise ValueError("Port must be between 1 and 65535")
         return v
 
-    @classmethod
     @field_validator("recipient", mode="before")
     def normalize_recipient(cls, v: str | List[str]):
         if isinstance(v, str):

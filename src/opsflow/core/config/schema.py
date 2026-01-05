@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PluginConfig(BaseModel):
@@ -7,6 +7,8 @@ class PluginConfig(BaseModel):
     Attributes:
         enabled (bool): Whether the plugin is active. Defaults to True.
     """
+
+    model_config = ConfigDict(validate_assignment=True)
 
     enabled: bool = True
 
@@ -17,6 +19,8 @@ class NotifierConfig(BaseModel):
     Attributes:
         enabled (bool): Whether the notifier is active. Defaults to False.
     """
+
+    model_config = ConfigDict(validate_assignment=True)
 
     enabled: bool = False
 
@@ -42,6 +46,11 @@ class CoreConfig(BaseModel):
         notifiers (Optional[Dict[str, NotifierConfig]]): Mapping of notifier names to configurations.
         plugins (Optional[Dict[str, PluginConfig]]): Mapping of plugin names to configurations.
     """
+
+    model_config = ConfigDict(
+        validate_assignment=True,
+        extra="forbid",
+    )
 
     dry_run: bool = False
     logging: LoggingConfig = LoggingConfig()

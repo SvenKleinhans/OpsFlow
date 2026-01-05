@@ -6,10 +6,10 @@ This script demonstrates two variants:
 2. Running the workflow with an ExampleSystemManager.
 """
 
-from examples.components.example_notifier import ExampleNotifier, ExampleNotifierConfig
-from examples.components.example_package_manager import ExamplePackageManager
-from examples.components.example_plugin import ExamplePlugin, ExamplePluginConfig
-from examples.components.example_system_manager import ExampleSystemManager
+from components.example_notifier import ExampleNotifier, ExampleNotifierConfig
+from components.example_package_manager import ExamplePackageManager
+from components.example_plugin import ExamplePlugin, ExamplePluginConfig
+from components.example_system_manager import ExampleSystemManager
 from opsflow.core.config import CoreConfig, LoggingConfig
 from opsflow.core.notifier import NotifierRegistry
 from opsflow.core.plugin import PluginRegistry
@@ -26,10 +26,15 @@ cfg = CoreConfig(
     dry_run=True,
     logging=LoggingConfig(debug=True, file="demo_workflow.log"),
     notifiers={
-        "example_notifier": ExampleNotifierConfig(enabled=True, notify_option="notify_value")
+        "example_notifier": ExampleNotifierConfig(
+            enabled=True, notify_option="notify_value"
+        )
     },
-    plugins={"example_plugin": ExamplePluginConfig(enabled=True, example_option="demo_value")},
+    plugins={
+        "example_plugin": ExamplePluginConfig(enabled=True, example_option="demo_value")
+    },
 )
+ExampleNotifierConfig.model_validate(cfg.notifiers["example_notifier"])
 
 # -------------------------------
 # Workflow without SystemManager

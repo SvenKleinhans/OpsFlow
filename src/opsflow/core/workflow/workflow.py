@@ -132,17 +132,23 @@ class Workflow:
             parallel (bool): If True, run plugins in parallel threads.
             max_workers (int): Maximum number of threads when running in parallel.
         """
-        self._logger.info("Running %d plugins (parallel=%s)...", len(self._plugins), parallel)
+        self._logger.info(
+            "Running %d plugins (parallel=%s)...", len(self._plugins), parallel
+        )
         if not parallel:
             for plugin in self._plugins:
                 self._run_single_plugin(plugin)
             return
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {executor.submit(self._run_single_plugin, p): p for p in self._plugins}
+            futures = {
+                executor.submit(self._run_single_plugin, p): p for p in self._plugins
+            }
             for _ in as_completed(futures):
                 # _run_single_plugin handles exceptions and results
-                self._logger.debug("Plugin future completed in thread %s", current_thread().name)
+                self._logger.debug(
+                    "Plugin future completed in thread %s", current_thread().name
+                )
 
     def process_results(self) -> None:
         """Format all collected results and send a report via the notifier."""
@@ -174,14 +180,18 @@ class Workflow:
         name = plugin.name
 
         self._logger.debug("[%s] Plugin %s setup started", thread, name)
-        if not self._safe_call(plugin.setup, step="setup", plugin=plugin, severity=Severity.ERROR):
+        if not self._safe_call(
+            plugin.setup, step="setup", plugin=plugin, severity=Severity.ERROR
+        ):
             return
 
         self._logger.debug("[%s] Plugin %s run started", thread, name)
         self._safe_call(plugin.run, step="run", plugin=plugin, severity=Severity.ERROR)
 
         self._logger.debug("[%s] Plugin %s teardown started", thread, name)
-        self._safe_call(plugin.teardown, step="teardown", plugin=plugin, severity=Severity.WARNING)
+        self._safe_call(
+            plugin.teardown, step="teardown", plugin=plugin, severity=Severity.WARNING
+        )
 
     def _safe_call(
         self,
@@ -278,7 +288,9 @@ class Workflow:
             List[Plugin]: List of plugin instances ready for execution.
         """
         self._logger.debug("Building plugins")
-        ctx = Context(result_collector=self._result_collector, dry_run=self._config.dry_run)
+        ctx = Context(
+            result_collector=self._result_collector, dry_run=self._config.dry_run
+        )
         factory = PluginFactory(config=self._config, ctx=ctx, logger=self._logger)
         plugins = list(factory.create_all())
         self._logger.debug("Total plugins instantiated: %d", len(plugins))

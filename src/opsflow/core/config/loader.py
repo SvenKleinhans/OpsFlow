@@ -36,13 +36,19 @@ class ConfigLoader:
         core = CoreConfig.model_validate(raw)
 
         # Load plugins and notifiers using the same helper method
-        core.plugins = ConfigLoader._load_entries(raw.get("plugins"), PluginRegistry.entries)
-        core.notifiers = ConfigLoader._load_entries(raw.get("notifiers"), NotifierRegistry.entries)
+        core.plugins = ConfigLoader._load_entries(
+            raw.get("plugins"), PluginRegistry.entries
+        )
+        core.notifiers = ConfigLoader._load_entries(
+            raw.get("notifiers"), NotifierRegistry.entries
+        )
 
         return core
 
     @staticmethod
-    def _load_entries(entry_data: dict | None, entries: dict[str, RegistryEntry]) -> dict:
+    def _load_entries(
+        entry_data: dict | None, entries: dict[str, RegistryEntry]
+    ) -> dict:
         """Create validated configuration objects from registry definitions.
 
         Maps raw YAML configuration data to validated configuration model

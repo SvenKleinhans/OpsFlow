@@ -1,63 +1,66 @@
 import sys
-
+from typing import Protocol, cast
+from pathlib import Path
 from opsflow.core.utils.module_loader import ModuleLoader
 
 
-def _cleanup_module_names(*names):
-    """Remove imported modules from sys.modules to avoid cross-test pollution."""
-    for name in names:
-        sys.modules.pop(name, None)
+class _PluginModule(Protocol):
+    OK: bool
+    VALUE: int
+    X: int
 
 
-def test_load_directory_with_explicit_package_name(tmp_path):
-    """Modules should load when a package name is explicitly provided."""
-    pkg_dir = tmp_path / "mypkg"
+def modules_from_dir(path: Path) -> dict[str, object]:
+    path = path.resolve()
+    result = {}
+    for name, mod in sys.modules.items():
+        file = getattr(mod, "__file__", None)
+        if file and Path(file).resolve().parent == path:
+            result[name] = mod
+    return result
+
+
+def test_load_directory_loads_modules(tmp_path):
+    pkg_dir = tmp_path / "plugins"
     pkg_dir.mkdir()
-    (pkg_dir / "__init__.py").write_text("""# package init""")
-    (pkg_dir / "a.py").write_text("""VALUE = 123""")
+    (pkg_dir / "a.py").write_text("VALUE = 123")
 
-    try:
-        ModuleLoader.load_from_directory(str(pkg_dir), package="mypkg")
+    ModuleLoader.load_from_directory(str(pkg_dir))
 
-        assert "mypkg.a" in sys.modules
-        mod = sys.modules["mypkg.a"]
-        assert mod.VALUE == 123
-    finally:
-        _cleanup_module_names("mypkg.a", "mypkg")
+    mods = modules_from_dir(pkg_dir)
+    assert len(mods) == 1
 
-
-def test_load_directory_infers_package_name_from_folder(tmp_path):
-    """If no package name is given, the folder name should be used as package."""
-    pkg_dir = tmp_path / "inferredpkg"
-    pkg_dir.mkdir()
-    (pkg_dir / "__init__.py").write_text("""# init""")
-    (pkg_dir / "mod1.py").write_text("""HELLO = 'world'""")
-
-    try:
-        ModuleLoader.load_from_directory(str(pkg_dir))
-
-        assert "inferredpkg.mod1" in sys.modules
-        mod = sys.modules["inferredpkg.mod1"]
-        assert mod.HELLO == "world"
-    finally:
-        _cleanup_module_names("inferredpkg.mod1", "inferredpkg")
+    mod = next(iter(mods.values()))
+    mod = cast(_PluginModule, mod)
+    assert mod.VALUE == 123
 
 
 def test_load_directory_ignores_non_python_files(tmp_path):
-    """Loader must ignore non-Python files and import only *.py modules."""
-    pkg_dir = tmp_path / "pkg2"
+    pkg_dir = tmp_path / "plugins"
     pkg_dir.mkdir()
-    (pkg_dir / "__init__.py").write_text("""# init""")
-    (pkg_dir / "good.py").write_text("""OK = True""")
-    (pkg_dir / "ignored.txt").write_text("this is ignored")
+    (pkg_dir / "good.py").write_text("OK = True")
+    (pkg_dir / "ignored.txt").write_text("NOPE")
 
-    try:
-        ModuleLoader.load_from_directory(str(pkg_dir))
+    ModuleLoader.load_from_directory(str(pkg_dir))
 
-        assert "pkg2.good" in sys.modules
-        mod = sys.modules["pkg2.good"]
-        assert mod.OK is True
+    mods = modules_from_dir(pkg_dir)
+    assert len(mods) == 1
 
-        assert all("ignored" not in name for name in sys.modules.keys())
-    finally:
-        _cleanup_module_names("pkg2.good", "pkg2")
+    mod = next(iter(mods.values()))
+    mod = cast(_PluginModule, mod)
+    assert mod.OK is True
+
+
+def test_load_directory_is_idempotent(tmp_path):
+    pkg_dir = tmp_path / "plugins"
+    pkg_dir.mkdir()
+    (pkg_dir / "a.py").write_text("X = 1")
+
+    ModuleLoader.load_from_directory(str(pkg_dir))
+    first = modules_from_dir(pkg_dir)
+
+    ModuleLoader.load_from_directory(str(pkg_dir))
+    second = modules_from_dir(pkg_dir)
+
+    assert first.keys() == second.keys()
+    assert cast(_PluginModule, next(iter(second.values()))).X == 1

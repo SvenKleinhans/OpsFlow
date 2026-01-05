@@ -1,6 +1,7 @@
 import importlib
 import pathlib
 import sys
+import types
 
 
 class ModuleLoader:
@@ -19,8 +20,19 @@ class ModuleLoader:
             ImportError: If a module fails to import.
         """
         directory = pathlib.Path(path).resolve()
-        if not package:
-            package = directory.name
+
+        runtime_root = "__opsflow_runtime__"
+        runtime_ns = f"{runtime_root}.{hash(directory)}"
+
+        if runtime_root not in sys.modules:
+            root_pkg = types.ModuleType(runtime_root)
+            root_pkg.__path__ = []
+            sys.modules[runtime_root] = root_pkg
+
+        if runtime_ns not in sys.modules:
+            pkg = types.ModuleType(runtime_ns)
+            pkg.__path__ = [str(directory)]
+            sys.modules[runtime_ns] = pkg
 
         parent_dir = str(directory.parent)
         if parent_dir not in sys.path:
@@ -30,8 +42,12 @@ class ModuleLoader:
             for file in directory.glob("*.py"):
                 if file.name == "__init__.py":
                     continue
-                module_name = file.stem
-                importlib.import_module(f"{package}.{module_name}")
+
+                full_name = f"{runtime_ns}.{file.stem}"
+                if full_name in sys.modules:
+                    continue
+
+                importlib.import_module(full_name)
         finally:
             if parent_dir in sys.path:
                 sys.path.remove(parent_dir)

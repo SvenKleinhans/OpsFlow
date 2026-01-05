@@ -1,4 +1,6 @@
 from collections.abc import Callable
+from pathlib import Path
+import sys
 from typing import Generic, TypeVar
 
 from .entry import RegistryEntry
@@ -84,17 +86,51 @@ class Registry(Generic[_C, _CFG]):
                 or if a component with the same name is already registered.
         """
         if not issubclass(cls, self._base_cls):
-            raise TypeError(f"{cls.__name__} must inherit from {self._base_cls.__name__}")
+            raise TypeError(
+                f"{cls.__name__} must inherit from {self._base_cls.__name__}"
+            )
 
         name = getattr(cls, "name", None)
         if not name or name == "unnamed":
             raise ValueError(f"{self._kind} {cls.__name__} must define a valid 'name'")
 
-        if name in self.entries:
-            raise ValueError(f"{self._kind} '{name}' is already registered")
+        existing = self.entries.get(name)
+        if existing is not None:
+            if self._origin_file(existing.component_cls) == self._origin_file(cls):
+                return
+
+            raise ValueError(
+                f"{self._kind} '{name}' already registered "
+                f"from {self._origin_file(existing.component_cls)}"
+            )
 
         self.entries[name] = RegistryEntry(
             component_cls=cls,
             config_cls=config or self._default_config,
             description=description,
         )
+
+    @staticmethod
+    def _origin_file(cls_type: type) -> Path | None:
+        """Return the resolved source file path of a class.
+
+        The path is derived from the module in which the class was defined.
+        This can be used to detect whether two classes originate from the same
+        source file even if they were imported under different module names.
+
+        Args:
+            cls_type: Class whose defining module should be inspected.
+
+        Returns:
+            The resolved path to the module's source file, or ``None`` if the
+            module is not loaded or does not define a ``__file__`` attribute.
+        """
+        mod = sys.modules.get(cls_type.__module__)
+        if not mod:
+            return None
+
+        file = getattr(mod, "__file__", None)
+        if not file:
+            return None
+
+        return Path(file).resolve()

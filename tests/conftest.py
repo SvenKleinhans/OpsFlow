@@ -8,7 +8,7 @@ from opsflow.core.models.context import Context
 from opsflow.core.models.result import ResultCollector
 from opsflow.core.notifier.registry import NotifierRegistry
 from opsflow.core.plugin.registry import PluginRegistry
-from opsflow.core.system.base import SystemManager
+from opsflow.core.system.system_manager import SystemManager
 
 # Import test dummies
 from .dummies.plugins import (
@@ -40,7 +40,7 @@ def logger():
 
 @pytest.fixture
 def context():
-    return Context(result_collector=ResultCollector(), dry_run=True)
+    return Context(None, result_collector=ResultCollector(), dry_run=False)
 
 
 @pytest.fixture

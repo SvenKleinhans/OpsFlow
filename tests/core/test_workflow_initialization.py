@@ -2,6 +2,7 @@ import logging
 from unittest.mock import Mock, patch
 
 from opsflow.core.workflow import Workflow
+from tests.support.fake_pkg_manager import FakePkgManager
 
 
 class TestWorkflowInitialization:
@@ -27,7 +28,9 @@ class TestWorkflowInitialization:
     def test_workflow_initializes_with_system_manager(self, config):
         """Workflow should initialize with an optional system manager."""
         mock_manager = Mock()
-        workflow = Workflow(system_manager=mock_manager, config=config)
+        workflow = Workflow(
+            system_manager=mock_manager, pkg_manager=FakePkgManager(), config=config
+        )
 
         assert workflow._system_manager is mock_manager
 

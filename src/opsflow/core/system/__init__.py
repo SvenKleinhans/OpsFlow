@@ -1,3 +1,4 @@
-from .base import PackageManager, SystemManager
+from .system_manager import SystemManager
+from .package_manager import PackageManager, ThreadSafePackageManager
 
-__all__ = ["PackageManager", "SystemManager"]
+__all__ = ["PackageManager", "SystemManager", "ThreadSafePackageManager"]

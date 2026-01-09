@@ -2,6 +2,7 @@ from unittest.mock import Mock, patch
 
 from opsflow.core.models import Result, Severity
 from opsflow.core.workflow import Workflow
+from ..support.fake_pkg_manager import FakePkgManager
 
 
 class TestWorkflowFullRun:
@@ -31,7 +32,11 @@ class TestWorkflowFullRun:
         mock_manager.check_reboot_required.return_value = None
         mock_manager.check_major_release_available.return_value = None
 
-        workflow = Workflow(system_manager=mock_manager, config=config_with_plugins)
+        workflow = Workflow(
+            system_manager=mock_manager,
+            pkg_manager=FakePkgManager(),
+            config=config_with_plugins,
+        )
 
         # Should execute without raising
         workflow.run_all()

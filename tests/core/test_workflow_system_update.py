@@ -1,8 +1,9 @@
 from unittest.mock import Mock
 
 from opsflow.core.models import Result, Severity
-from opsflow.core.system import PackageManager, SystemManager
+from opsflow.core.system import SystemManager
 from opsflow.core.workflow import Workflow
+from tests.support.fake_pkg_manager import FakePkgManager
 
 
 class TestWorkflowSystemUpdate:
@@ -21,7 +22,7 @@ class TestWorkflowSystemUpdate:
     def test_workflow_calls_system_manager_update(self, config):
         """Workflow should call system manager's update method."""
 
-        class MockPackageManager(PackageManager):
+        class MockPackageManager(FakePkgManager):
             def update(self, dry_run: bool = False) -> Result | None:
                 return Result(
                     step="package_update",
@@ -30,7 +31,9 @@ class TestWorkflowSystemUpdate:
                 )
 
             def upgrade(self, dry_run: bool = False) -> Result | None:
-                return Result(step="package_upgrade", severity=Severity.INFO, message="Upgraded")
+                return Result(
+                    step="package_upgrade", severity=Severity.INFO, message="Upgraded"
+                )
 
         class MockManager(SystemManager):
             def _is_reboot_required(self) -> bool:
@@ -39,8 +42,11 @@ class TestWorkflowSystemUpdate:
             def _is_new_stable_os_available(self) -> bool:
                 return True
 
-        mock_manager = MockManager(pkg_manager=MockPackageManager())
-        workflow = Workflow(system_manager=mock_manager, config=config)
+        workflow = Workflow(
+            system_manager=MockManager(),
+            pkg_manager=MockPackageManager(),
+            config=config,
+        )
         workflow.run_system_update()
 
         assert len(workflow._result_collector.results) == 4
@@ -50,12 +56,16 @@ class TestWorkflowSystemUpdate:
         mock_manager = Mock()
         mock_manager.update.side_effect = RuntimeError("System update failed")
 
-        workflow = Workflow(system_manager=mock_manager, config=config)
+        workflow = Workflow(
+            system_manager=mock_manager, pkg_manager=FakePkgManager(), config=config
+        )
 
         # Should not raise, but collect error
         workflow.run_system_update()
 
         error_results = [
-            r for r in workflow._result_collector.results if r.severity == Severity.ERROR
+            r
+            for r in workflow._result_collector.results
+            if r.severity == Severity.ERROR
         ]
         assert len(error_results) > 0

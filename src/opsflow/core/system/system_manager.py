@@ -2,34 +2,10 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 
+from .package_manager import PackageManager
+
 from ..models.context import Context
 from ..models.result import Result, Severity
-
-
-class PackageManager(ABC):
-    """Abstract base class for package management operations."""
-
-    @abstractmethod
-    def update(self, dry_run: bool = False) -> Result | None:
-        """Update package metadata.
-
-        Args:
-            dry_run (bool): If True, simulate the operation without making changes.
-
-        Returns:
-            Optional[Result]: A Result object if an issue occurred, otherwise None.
-        """
-
-    @abstractmethod
-    def upgrade(self, dry_run: bool = False) -> Result | None:
-        """Upgrade installed packages.
-
-        Args:
-            dry_run (bool): If True, simulate the operation without making changes.
-
-        Returns:
-            Optional[Result]: A Result object if an issue occurred, otherwise None.
-        """
 
 
 class SystemManager(ABC):
@@ -37,40 +13,41 @@ class SystemManager(ABC):
 
     def __init__(
         self,
-        pkg_manager: PackageManager,
         pre_update: list[Callable] | None = None,
         post_update: list[Callable] | None = None,
     ):
         """Initialize the system manager.
 
         Args:
-            pkg_manager (PackageManager): Package manager used for updates/upgrades.
             pre_update (Optional[List[Callable]]): Callables to execute before updates.
             post_update (Optional[List[Callable]]): Callables to execute after updates.
         """
-        self.pkg_manager = pkg_manager
         self.pre_update = pre_update or []
         self.post_update = post_update or []
 
+        self.pkg_manager: PackageManager
         self.logger: logging.Logger
         self.ctx: Context
 
-    def _attach_runtime(self, logger: logging.Logger, ctx: Context) -> None:
+    def _attach_runtime(
+        self, pkg_manager: PackageManager, logger: logging.Logger, ctx: Context
+    ) -> None:
         """Attach runtime components to the system manager.
 
         Args:
+            pkg_manager (PackageManager): Package manager used for updates/upgrades.
             logger (logging.Logger): Logger instance for output.
             ctx (Context): Contextual information for the operations.
         """
         self.logger = logger
         self.ctx = ctx
+        self.pkg_manager = pkg_manager
 
     def update(self) -> None:
         """Perform system update and upgrade with pre- and post-update hooks.
 
         Exceptions in hooks or package operations are caught and converted into `Result` objects.
         """
-        self.logger.info("Starting system update...")
 
         # Pre-update hooks
         for func in self.pre_update:
@@ -104,8 +81,6 @@ class SystemManager(ABC):
                 Result(step="Package upgrade", severity=Severity.ERROR, message=str(e))
             )
 
-        self.logger.info("System update completed successfully.")
-
         # Post-update hooks
         for func in self.post_update:
             try:
@@ -136,7 +111,9 @@ class SystemManager(ABC):
             message = "A new stable OS release is available"
             self.logger.warning(message)
             self.ctx.add_result(
-                Result(step="OS Upgrade Check", severity=Severity.WARNING, message=message)
+                Result(
+                    step="OS Upgrade Check", severity=Severity.WARNING, message=message
+                )
             )
 
     @abstractmethod

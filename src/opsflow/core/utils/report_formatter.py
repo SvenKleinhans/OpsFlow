@@ -21,7 +21,7 @@ class ReportFormatter:
         if not self.results:
             return "No workflow results available."
 
-        lines = ["Maintenance Summary", "====================", ""]
+        lines = ["Workflow Summary", "====================", ""]
 
         for severity in sorted(Severity, key=lambda s: s.value, reverse=True):
             section = [r for r in self.results if r.severity == severity]

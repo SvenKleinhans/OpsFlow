@@ -13,7 +13,11 @@ from ..notifier.composite import CompositeNotifier
 from ..notifier.factory import NotifierFactory
 from ..plugin.base import Plugin
 from ..plugin.factory import PluginFactory
-from ..system.base import SystemManager
+from ..system import (
+    PackageManager,
+    SystemManager,
+    ThreadSafePackageManager,
+)
 from ..utils.command_runner import CommandRunner
 from ..utils.logger_setup import setup_logger
 from ..utils.module_loader import ModuleLoader
@@ -22,12 +26,15 @@ from ..utils.module_loader import ModuleLoader
 class Workflow:
     """Orchestrator for executing system updates, plugins, and reporting results.
 
-    If no `SystemManager` is provided, the workflow can still run plugins and send reports.
+    The workflow manages the execution of plugins, system updates (if a `SystemManager`
+    is provided), and result reporting via notifiers. It can also operate in plugin-only
+    mode without a system manager, in which case system updates are skipped.
     """
 
     def __init__(
         self,
         system_manager: SystemManager | None = None,
+        pkg_manager: PackageManager | None = None,
         config: CoreConfig | None = None,
         config_path: str | None = None,
         plugin_dir: str | None = None,
@@ -39,7 +46,10 @@ class Workflow:
         initialize the optional system manager, result collector, and instantiate all plugins and notifiers.
 
         Args:
-            system_manager (Optional[SystemManager]): The system manager instance for system operations. Can be None.
+            system_manager (Optional[SystemManager]): System manager for performing system-level operations.
+                If provided, a valid `PackageManager` must also be supplied.
+            pkg_manager (Optional[PackageManager]): Package manager for installing or upgrading system packages.
+                Required if `system_manager` is provided. Can be None if running in plugin-only mode.
             config (Optional[CoreConfig]): Preloaded configuration object.
             config_path (Optional[str]): Path to a configuration file (used if `config` is None).
             plugin_dir (Optional[str]): Directory containing plugin modules.
@@ -67,12 +77,13 @@ class Workflow:
         self._ctx = Context(
             result_collector=self._result_collector,
             dry_run=self._config.dry_run,
+            pkg_manager=ThreadSafePackageManager(pkg_manager) if pkg_manager else None,
         )
 
         # Attach framework-managed runtime dependencies to the system manager
         # before it is used by the workflow
-        if system_manager:
-            system_manager._attach_runtime(self._logger, self._ctx)
+        if system_manager and pkg_manager:
+            system_manager._attach_runtime(pkg_manager, self._logger, self._ctx)
             self._system_manager = system_manager
         else:
             self._system_manager = None
@@ -123,7 +134,7 @@ class Workflow:
                 Result(step="system_update", severity=Severity.ERROR, message=str(e))
             )
 
-        self._logger.debug("System update completed")
+        self._logger.info("System update completed")
 
     def run_plugins(self, parallel: bool = False, max_workers: int = 4) -> None:
         """Execute all instantiated plugins and collect their results.
@@ -288,10 +299,7 @@ class Workflow:
             List[Plugin]: List of plugin instances ready for execution.
         """
         self._logger.debug("Building plugins")
-        ctx = Context(
-            result_collector=self._result_collector, dry_run=self._config.dry_run
-        )
-        factory = PluginFactory(config=self._config, ctx=ctx, logger=self._logger)
+        factory = PluginFactory(config=self._config, ctx=self._ctx, logger=self._logger)
         plugins = list(factory.create_all())
         self._logger.debug("Total plugins instantiated: %d", len(plugins))
         return plugins

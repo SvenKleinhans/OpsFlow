@@ -1,5 +1,9 @@
+from typing import TYPE_CHECKING
 from ..utils.command_runner import CommandRunner
 from .result import Result, ResultCollector
+
+if TYPE_CHECKING:
+    from ..system import ThreadSafePackageManager
 
 
 class Context:
@@ -8,7 +12,13 @@ class Context:
     Contains only lightweight, globally relevant services.
     """
 
-    def __init__(self, result_collector: ResultCollector, dry_run: bool):
+    def __init__(
+        self,
+        pkg_manager: ThreadSafePackageManager | None,
+        result_collector: ResultCollector,
+        dry_run: bool,
+    ):
+        self.pkg_manager = pkg_manager
         self._result_collector = result_collector
         self.dry_run = dry_run
         self.cmd = CommandRunner

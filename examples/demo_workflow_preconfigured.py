@@ -45,6 +45,9 @@ wf_no_system.run_all()
 # -------------------------------
 # Workflow with SystemManager and PackageManager
 # -------------------------------
-system_manager = ExampleSystemManager(pkg_manager=ExamplePackageManager())
-wf_with_system = Workflow(system_manager=system_manager, config=cfg)
+wf_with_system = Workflow(
+    system_manager=ExampleSystemManager(),
+    pkg_manager=ExamplePackageManager(),
+    config=cfg,
+)
 wf_with_system.run_all()

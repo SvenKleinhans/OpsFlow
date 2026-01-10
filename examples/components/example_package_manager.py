@@ -30,3 +30,13 @@ class ExamplePackageManager(PackageManager):
             severity=Severity.INFO,
             message="Packages upgraded successfully.",
         )
+
+    def install(self, package: str, version: str | None) -> Result | None:
+        print(f"Installing package {package} version {version or 'latest'}")
+        return None
+
+    def get_installed(self, package: str) -> str | None:
+        return "1.0.0"
+
+    def get_candidate(self, package: str) -> str | None:
+        return "1.1.0"

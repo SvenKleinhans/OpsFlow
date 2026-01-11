@@ -58,6 +58,9 @@ class CommandRunner:
         cmd = command.copy()
         if use_sudo:
             cmd.insert(0, "sudo")
+            # Inject environment variables if present
+            if env:
+                cmd.insert(1, "-E")
 
         logger.debug("RUN: %s", " ".join(cmd))
 
